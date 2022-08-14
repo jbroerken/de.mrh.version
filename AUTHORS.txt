@@ -1,0 +1,7 @@
+###
+#
+#  de.mrh.version Authors
+#
+###
+
+Jens Brörken <jens.broerken@gmail.com>
