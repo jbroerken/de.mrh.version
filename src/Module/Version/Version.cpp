@@ -15,6 +15,7 @@
  */
 
 // C / C++
+#include <cstring>
 
 // External
 #include <libmrhbf.h>
