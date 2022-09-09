@@ -25,7 +25,7 @@
 // Project
 
 
-class Version : public MRH_Module
+class Version : public MRH::AB::Module
 {
 public:
     
@@ -63,7 +63,7 @@ public:
      *  \return The module update result.
      */
     
-    MRH_Module::Result Update() override;
+    MRH::AB::Module::Result Update() override;
     
     /**
      *  Get the module to switch to.
@@ -71,7 +71,7 @@ public:
      *  \return The module switch information.
      */
     
-    std::unique_ptr<MRH_Module> NextModule() override;
+    std::unique_ptr<MRH::AB::Module> NextModule() override;
     
     //*************************************************************************************
     // Getters
@@ -93,7 +93,7 @@ private:
     // Data
     //*************************************************************************************
     
-    MRH_ModuleTimer c_Timer;
+    MRH::AB::ModuleTimer c_Timer;
     
     MRH_Uint32 u32_SentOutputID;
     MRH_Uint32 u32_ReceivedOutputID;

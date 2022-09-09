@@ -30,7 +30,7 @@
 // Pre-defined
 namespace
 {
-    libmrhab* p_Context = NULL;
+    MRH::AB::Context* p_Context = NULL;
 }
 
 
@@ -46,7 +46,7 @@ extern "C"
 
     int MRH_Init(const char* p_LaunchInput, int i_LaunchCommandID)
     {
-        MRH_ModuleLogger& c_Logger = MRH_ModuleLogger::Singleton();
+        MRH::AB::ModuleLogger& c_Logger = MRH::AB::ModuleLogger::Singleton();
         c_Logger.Log("MRH_Init", "Initializing version application (Version: " +
                                  std::string(REVISION_STRING) +
                                  ")",
@@ -54,7 +54,7 @@ extern "C"
     
         try
         {
-            p_Context = new libmrhab(std::make_unique<Version>());
+            p_Context = new MRH::AB::Context(std::make_unique<Version>());
             return 0;
         }
         catch (std::exception& e)
@@ -76,11 +76,11 @@ extern "C"
         {
             p_Context->AddReceivedEvent(p_Event);
         }
-        catch (MRH_ABException& e)
+        catch (MRH::AB::ABException& e)
         {
-            MRH_ModuleLogger::Singleton().Log("MRH_ReceiveEvent", "Failed to add received event: " +
-                                                                  e.what2(),
-                                              "Main.cpp", __LINE__);
+            MRH::AB::ModuleLogger::Singleton().Log("MRH_ReceiveEvent", "Failed to add received event: " +
+                                                                       e.what2(),
+                                                   "Main.cpp", __LINE__);
         }
     }
 

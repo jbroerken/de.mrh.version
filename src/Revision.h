@@ -28,11 +28,11 @@
 // App Revision
 //*************************************************************************************
 
-#define REVISION_STRING "1.0.1"
+#define REVISION_STRING "1.0.2"
 
 #define REVISION_MAJOR 1
 #define REVISION_MINOR 0
-#define REVISION_PATCH 1
+#define REVISION_PATCH 2
 
 
 #endif /* Revision_h */

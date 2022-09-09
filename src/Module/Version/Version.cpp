@@ -41,8 +41,8 @@ namespace
 // Constructor / Destructor
 //*************************************************************************************
 
-Version::Version() : MRH_Module("Version",
-                                true),
+Version::Version() : MRH::AB::Module("Version",
+                                     true),
                      c_Timer(VERSION_OUTPUT_TIMEOUT_MS),
                      u32_SentOutputID((rand() % ((MRH_Uint32) - 1)) + 1),
                      u32_ReceivedOutputID(0)
@@ -55,7 +55,7 @@ Version::Version() : MRH_Module("Version",
     
     try
     {
-        MRH_BlockFile c_File(MRH_VERSION_FILE_PATH);
+        MRH::BF::BlockFile c_File(MRH_VERSION_FILE_PATH);
         
         for (auto& Block : c_File.l_Block)
         {
@@ -72,26 +72,26 @@ Version::Version() : MRH_Module("Version",
         
         if (s_Version.size() == 0)
         {
-            throw MRH_ModuleException("Version",
-                                      "Failed to read version from file!");
+            throw MRH::AB::ModuleException("Version",
+                                           "Failed to read version from file!");
         }
     }
     catch (std::exception& e)
     {
-        throw MRH_ModuleException("Version",
-                                  e.what());
+        throw MRH::AB::ModuleException("Version",
+                                       e.what());
     }
     
     /**
      *  Output
      */
     
-    MRH_ModuleLogger::Singleton().Log("Version", "Sending version output: " +
-                                                 s_Version +
-                                                 " (ID: " +
-                                                 std::to_string(u32_SentOutputID) +
-                                                 ")",
-                                      "Version.cpp", __LINE__);
+    MRH::AB::ModuleLogger::Singleton().Log("Version", "Sending version output: " +
+                                                      s_Version +
+                                                      " (ID: " +
+                                                      std::to_string(u32_SentOutputID) +
+                                                      ")",
+                                           "Version.cpp", __LINE__);
     // Setup event data
     MRH_EvD_S_String_U c_Data;
     
@@ -104,20 +104,21 @@ Version::Version() : MRH_Module("Version",
     
     if (p_Event == NULL)
     {
-        throw MRH_ModuleException("Version", 
-                                  "Failed to create output event!");
+        throw MRH::AB::ModuleException("Version", 
+                                       "Failed to create output event!");
     }
     
     // Attempt to add to out storage
     try
     {
-        MRH_EventStorage::Singleton().Add(p_Event);
+        MRH::AB::EventStorage::Singleton().Add(p_Event);
     }
-    catch (MRH_ABException& e)
+    catch (MRH::AB::ABException& e)
     {
         MRH_EVD_DestroyEvent(p_Event);
-        throw MRH_ModuleException("Version", 
-                                  "Failed to send version output: " + e.what2());
+        
+        throw MRH::AB::ModuleException("Version", 
+                                       "Failed to send version output: " + e.what2());
     }
 }
 
@@ -135,33 +136,33 @@ void Version::HandleEvent(const MRH_Event* p_Event)
     
     if (MRH_EVD_ReadEvent(&c_String, p_Event->u32_Type, p_Event) < 0)
     {
-        MRH_ModuleLogger::Singleton().Log("Version", "Failed to read string event!",
-                                          "Version.cpp", __LINE__);
+        MRH::AB::ModuleLogger::Singleton().Log("Version", "Failed to read string event!",
+                                               "Version.cpp", __LINE__);
     }
     else
     {
-        MRH_ModuleLogger::Singleton().Log("Version", "Received output performed: " +
-                                          std::to_string(c_String.u32_ID),
-                                          "Version.cpp", __LINE__);
+        MRH::AB::ModuleLogger::Singleton().Log("Version", "Received output performed: " +
+                                                          std::to_string(c_String.u32_ID),
+                                               "Version.cpp", __LINE__);
         
         u32_ReceivedOutputID = c_String.u32_ID;
     }
 }
 
-MRH_Module::Result Version::Update()
+MRH::AB::Module::Result Version::Update()
 {
     if (c_Timer.GetTimerFinished() == true || u32_SentOutputID == u32_ReceivedOutputID)
     {
-        return MRH_Module::FINISHED_POP;
+        return MRH::AB::Module::FINISHED_POP;
     }
     
-    return MRH_Module::IN_PROGRESS;
+    return MRH::AB::Module::IN_PROGRESS;
 }
 
-std::unique_ptr<MRH_Module> Version::NextModule()
+std::unique_ptr<MRH::AB::Module> Version::NextModule()
 {
-    throw MRH_ModuleException("Version",
-                              "No module to switch to!");
+    throw MRH::AB::ModuleException("Version",
+                                   "No module to switch to!");
 }
 
 //*************************************************************************************

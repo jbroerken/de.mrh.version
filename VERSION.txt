@@ -11,3 +11,10 @@
 1.0.1:
 ------
 - Add missing header.
+
+1.0.2:
+------
+- Use libmrhab 1.2.0.
+- Use libmrhbf 1.1.0.
+- Use libmrhvt 1.1.0.
+- Update launch trigger file formats.

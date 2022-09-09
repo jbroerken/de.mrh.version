@@ -4,9 +4,9 @@
 #  Compare Method  #
 ####################
 
-<CompareMethod>{
-    <Identifier><1>
-    <LS_Similarity><0.75>
+<Compare>{
+    <Method><1>
+    <Similarity><0.75>
 }
 
 ##############
