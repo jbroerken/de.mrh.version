@@ -18,3 +18,7 @@
 - Use libmrhbf 1.1.0.
 - Use libmrhvt 1.1.0.
 - Update launch trigger file formats.
+
+1.0.3:
+------
+- Updated app service configuration values.

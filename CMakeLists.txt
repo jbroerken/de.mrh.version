@@ -27,7 +27,7 @@ set(CMAKE_CXX_STANDARD 14)
 #  ------------
 #  General simple information about our project.
 ###
-project(de.mrh.version VERSION 1.0.2
+project(de.mrh.version VERSION 1.0.3
                        DESCRIPTION "MRH version info application"
                        LANGUAGES CXX)
 
