@@ -119,4 +119,4 @@ target_link_libraries(MRH_App PUBLIC mrhab)
 #  ------------------
 #  Preprocessor source definitions.
 ###
-target_compile_definitions(MRH_App PRIVATE MRH_VERSION_FILE_PATH="/usr/local/etc/mrh/MRH_Version.conf")
+target_compile_definitions(MRH_App PRIVATE MRH_VERSION_FILE_PATH="/usr/share/mrh/version.conf")
