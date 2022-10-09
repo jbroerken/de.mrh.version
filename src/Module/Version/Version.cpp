@@ -25,7 +25,7 @@
 
 // Pre-defined
 #ifndef MRH_VERSION_FILE_PATH
-    #define MRH_VERSION_FILE_PATH "/usr/local/etc/mrh/MRH_Version.conf"
+    #define MRH_VERSION_FILE_PATH "/usr/share/mrh/version.conf"
 #endif
 #define VERSION_OUTPUT_TIMEOUT_MS 30000
 
