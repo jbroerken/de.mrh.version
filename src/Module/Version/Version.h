@@ -93,8 +93,6 @@ private:
     // Data
     //*************************************************************************************
     
-    MRH::AB::ModuleTimer c_Timer;
-    
     MRH_Uint32 u32_SentOutputID;
     MRH_Uint32 u32_ReceivedOutputID;
     

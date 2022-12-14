@@ -27,7 +27,6 @@
 #ifndef MRH_VERSION_FILE_PATH
     #define MRH_VERSION_FILE_PATH "/usr/share/mrh/version.conf"
 #endif
-#define VERSION_OUTPUT_TIMEOUT_MS 30000
 
 namespace
 {
@@ -41,9 +40,7 @@ namespace
 // Constructor / Destructor
 //*************************************************************************************
 
-Version::Version() : MRH::AB::Module("Version",
-                                     VERSION_OUTPUT_TIMEOUT_MS + 1),
-                     c_Timer(VERSION_OUTPUT_TIMEOUT_MS),
+Version::Version() : MRH::AB::Module("Version"),
                      u32_SentOutputID((rand() % ((MRH_Uint32) - 1)) + 1),
                      u32_ReceivedOutputID(0)
 {
@@ -151,7 +148,7 @@ void Version::HandleEvent(const MRH_Event* p_Event)
 
 MRH::AB::Module::Result Version::Update()
 {
-    if (c_Timer.GetTimerFinished() == true || u32_SentOutputID == u32_ReceivedOutputID)
+    if (u32_SentOutputID == u32_ReceivedOutputID)
     {
         return MRH::AB::Module::FINISHED_POP;
     }
