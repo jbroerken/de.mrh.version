@@ -42,7 +42,7 @@ namespace
 //*************************************************************************************
 
 Version::Version() : MRH::AB::Module("Version",
-                                     true),
+                                     VERSION_OUTPUT_TIMEOUT_MS + 1),
                      c_Timer(VERSION_OUTPUT_TIMEOUT_MS),
                      u32_SentOutputID((rand() % ((MRH_Uint32) - 1)) + 1),
                      u32_ReceivedOutputID(0)
