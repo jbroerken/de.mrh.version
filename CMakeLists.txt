@@ -27,7 +27,7 @@ set(CMAKE_CXX_STANDARD 14)
 #  ------------
 #  General simple information about our project.
 ###
-project(de.mrh.version VERSION 1.0.4
+project(de.mrh.version VERSION 1.1.0
                        DESCRIPTION "MRH version info application"
                        LANGUAGES CXX)
 
@@ -63,9 +63,6 @@ set(SRC_DIR_PATH "${CMAKE_SOURCE_DIR}/src/")
              
 set(SRC_LIST_APP "${SRC_DIR_PATH}/Revision.h"
                  "${SRC_DIR_PATH}/Main.cpp")
-                 
-set(SRC_LIST_MODULE "${SRC_DIR_PATH}/Module/Version/Version.cpp"
-                    "${SRC_DIR_PATH}/Module/Version/Version.h")
 
 #########################################################################
 #
@@ -83,8 +80,7 @@ set(SRC_LIST_MODULE "${SRC_DIR_PATH}/Module/Version/Version.cpp"
 #  and application services Service.so!
 #  They are build as shared objects.
 ###
-add_library(MRH_App SHARED ${SRC_LIST_APP}
-                           ${SRC_LIST_MODULE})
+add_library(MRH_App SHARED ${SRC_LIST_APP})
 set_target_properties(MRH_App
                       PROPERTIES
                       PREFIX ""

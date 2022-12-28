@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2022 The MRH Project Authors.
+ *  Copyright (C) 2022 The de.mrh.version Authors.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,17 +20,31 @@
 #include <iostream>
 
 // External
+#include <libmrh/Send/MRH_SendEvent.h>
 #include <libmrh/MRH_AppLoop.h>
-#include <libmrhab.h>
+#include <libmrhevdata.h>
+#include <libmrhab/MRH_ABLogger.h>
+#include <libmrhbf.h>
+#include <libmrhvt/Output/MRH_Generator.h>
 
 // Project
-#include "./Module/Version/Version.h"
 #include "./Revision.h"
 
 // Pre-defined
+#ifndef MRH_VERSION_FILE_PATH
+    #define MRH_VERSION_FILE_PATH "/usr/share/mrh/version.conf"
+#endif
+
+// Namespace
 namespace
 {
-    MRH::AB::Context* p_Context = NULL;
+    // File Info
+    const char* p_MRHBlock = "MRH";
+    const char* p_NameKey = "Name";
+    const char* p_VersionKey = "Version";
+
+    // Output Info
+    MRH_Uint32 u32_OutputID = 0;
 }
 
 
@@ -39,76 +53,166 @@ namespace
 extern "C"
 {
 #endif
-    
+
+    //*************************************************************************************
+    // Output
+    //*************************************************************************************
+
+    MRH_Event* GenerateVersionOutput() noexcept
+    {
+        MRH::AB::Logger& c_Logger = MRH::AB::Logger::Singleton();
+
+        /**
+         *  File
+         */
+
+        std::string s_Version = "";
+
+        try
+        {
+            MRH::BF::BlockFile c_File(MRH_VERSION_FILE_PATH);
+
+            for (auto& Block : c_File.l_Block)
+            {
+                if (Block.GetName().compare(p_MRHBlock) == 0)
+                {
+                    s_Version = Block.GetValue(p_NameKey);
+                    s_Version += ", Version ";
+                    s_Version += Block.GetValue(p_VersionKey);
+                    s_Version += ".";
+
+                    break;
+                }
+            }
+
+            if (s_Version.size() == 0)
+            {
+                c_Logger.Log(MRH::AB::Logger::ERROR, "Failed to read version from file!",
+                             "Main.cpp", __LINE__);
+                return NULL;
+            }
+        }
+        catch (std::exception& e)
+        {
+            c_Logger.Log(MRH::AB::Logger::ERROR, e.what(),
+                         "Main.cpp", __LINE__);
+            return NULL;
+        }
+
+        /**
+         *  Output
+         */
+
+        c_Logger.Log(MRH::AB::Logger::INFO, "Sending version output: " +
+                                            s_Version +
+                                            " (ID: " +
+                                            std::to_string(u32_OutputID) +
+                                            ")",
+                     "Version.cpp", __LINE__);
+
+        // Setup event data
+        MRH_EvD_S_String_U c_Data;
+
+        memset((c_Data.p_String), '\0', MRH_EVD_S_STRING_BUFFER_MAX_TERMINATED);
+        strncpy(c_Data.p_String, s_Version.c_str(), MRH_EVD_S_STRING_BUFFER_MAX);
+        c_Data.u32_ID = u32_OutputID;
+
+        // Create event
+        MRH_Event* p_Event = MRH_EVD_CreateSetEvent(MRH_EVENT_SAY_STRING_U, &c_Data);
+
+        if (p_Event == NULL)
+        {
+            c_Logger.Log(MRH::AB::Logger::ERROR, "Failed to create output event!",
+                         "Main.cpp", __LINE__);
+            return NULL;
+        }
+
+        return p_Event;
+    }
+
     //*************************************************************************************
     // Init
     //*************************************************************************************
 
-    int MRH_Init(const char* p_LaunchInput, int i_LaunchCommandID)
+    int MRH_Init(const MRH_A_SendContext* p_SendContext, const char* p_LaunchInput, int i_LaunchCommandID)
     {
-        MRH::AB::ModuleLogger& c_Logger = MRH::AB::ModuleLogger::Singleton();
-        c_Logger.Log("MRH_Init", "Initializing version application (Version: " +
-                                 std::string(REVISION_STRING) +
-                                 ")",
+        MRH::AB::Logger& c_Logger = MRH::AB::Logger::Singleton();
+
+        c_Logger.Log(MRH::AB::Logger::INFO, "Initializing version application (Version: " +
+                                            std::string(REVISION_STRING) +
+                                            ")",
                      "Main.cpp", __LINE__);
-    
-        try
+
+        // Get output string event
+        MRH_Event* p_Event = GenerateVersionOutput();
+
+        if (p_Event == NULL)
         {
-            p_Context = new MRH::AB::Context(std::make_unique<Version>());
-            return 0;
-        }
-        catch (std::exception& e)
-        {
-            c_Logger.Log("MRH_Init", "Failed to initialize: " +
-                                     std::string(e.what()),
+            c_Logger.Log(MRH::AB::Logger::INFO, "Failed to create version output!",
                          "Main.cpp", __LINE__);
             return -1;
         }
+
+        // Attempt to send
+        while (true)
+        {
+            switch (MRH_A_SendEvent(p_SendContext, &p_Event)) /* Consumes p_Event */
+            {
+                case MRH_A_Send_Result::MRH_A_SEND_OK:
+                    c_Logger.Log(MRH::AB::Logger::INFO, "Sent output event",
+                                 "Main.cpp", __LINE__);
+                    return 0;
+                case MRH_A_Send_Result::MRH_A_SEND_FAILURE:
+                    c_Logger.Log(MRH::AB::Logger::ERROR, "Failed to send output event!",
+                                 "Main.cpp", __LINE__);
+                    return -1;
+
+                default:
+                    break;
+            }
+        }
     }
 
     //*************************************************************************************
-    // Receive Event
+    // Update
     //*************************************************************************************
 
-    void MRH_ReceiveEvent(const MRH_Event* p_Event)
+    int MRH_Update(const MRH_Event* p_Event)
     {
-        try
+        if (p_Event == NULL && p_Event->u32_Type != MRH_EVENT_SAY_STRING_S)
         {
-            p_Context->AddReceivedEvent(p_Event);
+            // Wait for correct event
+            return 0;
         }
-        catch (MRH::AB::ABException& e)
+
+        MRH_EvD_S_String_S c_Data;
+
+        if (MRH_EVD_ReadEvent(&c_Data, p_Event->u32_Type, p_Event) < 0)
         {
-            MRH::AB::ModuleLogger::Singleton().Log("MRH_ReceiveEvent", "Failed to add received event: " +
-                                                                       e.what2(),
-                                                   "Main.cpp", __LINE__);
+            MRH::AB::Logger::Singleton().Log(MRH::AB::Logger::ERROR, "Failed to read string response event!",
+                                             "Main.cpp", __LINE__);
         }
-    }
+        else if (c_Data.u32_ID != u32_OutputID)
+        {
+            MRH::AB::Logger::Singleton().Log(MRH::AB::Logger::ERROR, "Wrong output ID received!",
+                                             "Main.cpp", __LINE__);
+        }
+        else
+        {
+            MRH::AB::Logger::Singleton().Log(MRH::AB::Logger::INFO, "Version output performed.",
+                                             "Main.cpp", __LINE__);
+        }
 
-    //*************************************************************************************
-    // Send Event
-    //*************************************************************************************
-
-    MRH_Event* MRH_SendEvent(void)
-    {
-        return p_Context->GetSendEvent();
+        // Terminate in any case
+        return -1;
     }
 
     //*************************************************************************************
     // Exit
     //*************************************************************************************
 
-    int MRH_CanExit(void)
-    {
-        return p_Context->GetQuit() ? 0 : -1;
-    }
-
     void MRH_Exit(void)
-    {
-        if (p_Context != NULL)
-        {
-            delete p_Context;
-        }
-    }
+    {}
 
 #ifdef __cplusplus
 }

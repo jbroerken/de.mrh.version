@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2022 The MRH Project Authors.
+ *  Copyright (C) 2022 The de.mrh.version Authors.
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@
 
 
 //*************************************************************************************
-// App Revision
+// Revision
 //*************************************************************************************
 
-#define REVISION_STRING "1.0.4"
+#define REVISION_STRING "1.1.0"
 
 #define REVISION_MAJOR 1
-#define REVISION_MINOR 0
-#define REVISION_PATCH 4
+#define REVISION_MINOR 1
+#define REVISION_PATCH 0
 
 
 #endif /* Revision_h */
