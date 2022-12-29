@@ -16,6 +16,7 @@
 
 // C / C++
 #include <cstdio>
+#include <cstring>
 #include <string>
 #include <iostream>
 
