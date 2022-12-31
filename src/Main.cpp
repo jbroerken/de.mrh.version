@@ -180,7 +180,7 @@ extern "C"
 
     int MRH_Update(const MRH_Event* p_Event)
     {
-        if (p_Event == NULL && p_Event->u32_Type != MRH_EVENT_SAY_STRING_S)
+        if (p_Event->u32_Type != MRH_EVENT_SAY_STRING_S)
         {
             // Wait for correct event
             return 0;
